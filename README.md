@@ -56,31 +56,20 @@
             if (userInput) {
                 chatBox.innerHTML += `<div><strong>Сіз:</strong> ${userInput}</div>`;
                 
-                // OpenAI API арқылы жауап алу
-                const response = await getAIResponse(userInput);
-                
-                chatBox.innerHTML += `<div><strong>Жасанды Интеллект:</strong> ${response}</div>`;
+                // Серверге сұраныс жіберу
+                const response = await fetch('http://localhost:3000/ask', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ input: userInput })
+                });
+
+                const data = await response.json();
+                chatBox.innerHTML += `<div><strong>Жасанды Интеллект:</strong> ${data.response}</div>`;
                 document.getElementById('user-input').value = '';
                 chatBox.scrollTop = chatBox.scrollHeight;
             }
-        }
-
-        async function getAIResponse(userInput) {
-            const apiKey = 'sk-z9vAC3kfHmY8rgg0mxI4UdP9nF81x';  // OpenAI API кілтін осында қойыңыз
-            const response = await fetch('https://api.openai.com/v1/completions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}`
-                },
-                body: JSON.stringify({
-                    model: "text-davinci-003",  // Немесе жаңа модель
-                    prompt: userInput,
-                    max_tokens: 150
-                })
-            });
-            const data = await response.json();
-            return data.choices[0].text.trim();
         }
     </script>
 </body>
